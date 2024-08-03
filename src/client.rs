@@ -35,10 +35,10 @@ impl Client {
 		if let Some(params) = params {
 			req = req.query(&params);
 		}
-		// let ret: T = req.send().await.map_err(|_| Error::Something)?.json().await.map_err(|_| Error::Something)?;
 		// let tmp = req.try_clone().unwrap().send().await.unwrap();
 		// let txt = tmp.text().await.unwrap();
 		// println!("{}", txt);
+		// let ret: T = req.send().await.map_err(|_| Error::Something)?.json().await.map_err(|_| Error::Something)?;
 		let ret: T = req.send().await.unwrap().json().await.unwrap();
 		Ok(ret)
 	}
@@ -50,6 +50,16 @@ impl Client {
 
 	pub async fn get_card(&self, id: impl Into<String>) -> Result<Option<Card>> {
 		let resp: ApiResponse<Card> = self.get(&format!("cards/{}", id.into()), None).await?;
+		Ok(resp.data)
+	}
+
+	pub async fn search_cards(&self, q: Option<&str>) -> Result<Option<Vec<Card>>> {
+		let params = if let Some(query) = q {
+			Some(vec![("q", query)])
+		} else {
+			None
+		};
+		let resp: PaginatedApiResponse<Card> = self.get("cards", params).await?;
 		Ok(resp.data)
 	}
 }

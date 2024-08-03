@@ -9,8 +9,8 @@ pub struct Card {
 	pub supertype: String,
 	pub subtypes: Vec<String>,
 	pub level: Option<String>,
-	pub hp: String,
-	pub types: Vec<String>,
+	pub hp: Option<String>,
+	pub types: Option<Vec<String>>,
 	pub evolves_from: Option<String>,
 	pub evolves_to: Option<Vec<String>>,
 	pub rules: Option<Vec<String>>,
@@ -27,7 +27,7 @@ pub struct Card {
 	pub artist: String,
 	pub rarity: Option<String>,
 	pub flavor_text: Option<String>,
-	pub national_pokedex_numbers: Vec<i32>,
+	pub national_pokedex_numbers: Option<Vec<i32>>,
 	pub legalities: HashMap<String, String>,
 	pub regulation_mark: Option<String>,
 	pub images: Images,
@@ -35,6 +35,14 @@ pub struct Card {
 	// pub tcgplayer: TCGPlayer
 	// pub cardmarket: CardMarket
 }
+
+impl PartialEq for Card {
+	fn eq(&self, other: &Self) -> bool {
+		self.name == other.name
+	}
+}
+
+impl Eq for Card {}
 
 /// Card Specific Types
 #[derive(Debug, Clone, Serialize, Deserialize)]
