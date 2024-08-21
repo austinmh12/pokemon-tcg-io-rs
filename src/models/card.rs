@@ -7,7 +7,7 @@ pub struct Card {
 	pub id: String,
 	pub name: String,
 	pub supertype: String,
-	pub subtypes: Vec<String>,
+	pub subtypes: Option<Vec<String>>,
 	pub level: Option<String>,
 	pub hp: Option<String>,
 	pub types: Option<Vec<String>>,
