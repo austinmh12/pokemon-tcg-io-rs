@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
 
 use super::{Ability, Attack, Images, TCGPlayer, CardMarket};
+use crate::Set;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -23,8 +24,7 @@ pub struct Card {
 	pub resistances: Option<Vec<HashMap<String, String>>>,
 	pub retreat_cost: Option<Vec<String>>,
 	pub converted_retreat_cost: Option<i32>,
-	// Skip for now
-	// pub set: Set,
+	pub set: Set,
 	pub number: String,
 	pub artist: String,
 	pub rarity: Option<String>,
@@ -33,7 +33,6 @@ pub struct Card {
 	pub legalities: HashMap<String, String>,
 	pub regulation_mark: Option<String>,
 	pub images: Images,
-	// Skip for now
 	pub tcgplayer: Option<TCGPlayer>,
 	pub cardmarket: Option<CardMarket>,
 }
