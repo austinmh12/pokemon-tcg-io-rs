@@ -116,7 +116,11 @@ impl ClientBuilder {
 #[cfg(test)]
 mod tests {
 	use super::*;
-	
+	// What I want client.get_card() to return is a GetCard builder that has a select() method and a send() method
+	// So that you can call client.get_card("id").send().await?; to get the card
+	// Or client.get_card("id").select("name").send().await?; to get the card with just the name filled out
+	// Heavily inspired by reqwest and it's client.get() -> RequestBuilder / client.get().send() api
+
 	#[tokio::test]
 	#[ignore] // Heavy test, doesn't need to be run by default
 	async fn test_cards() -> Result<()> {
