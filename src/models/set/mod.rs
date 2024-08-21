@@ -1,8 +1,9 @@
 // Modules
-mod card;
 mod set;
+mod images;
 
 // Flatten
-pub use card::Card;
+use images::Images;
 
 // Public Modules
+pub use set::Set;

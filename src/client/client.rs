@@ -1,5 +1,6 @@
 use std::sync::Arc;
-use crate::{models::{Card, PaginatedApiResponse, ApiResponse}, Error, Result};
+use super::{PaginatedApiResponse, ApiResponse};
+use crate::{models::Card, Error, Result};
 
 #[derive(Debug, Clone)]
 pub struct Client {
@@ -134,5 +135,74 @@ mod tests {
 		assert!(card.is_some());
 		assert_eq!(card.unwrap().id, String::from("xy1-1"));
 		Ok(())
+	}
+
+	async fn test_card_with_select() {
+		todo!()
+	}
+
+	// #[tokio::test]
+	async fn test_search_cards() -> Result<()> {
+		todo!()
+	}
+
+	async fn test_search_cards_with_page() -> Result<()> {
+		todo!()
+	}
+
+	async fn test_search_cards_with_page_size() -> Result<()> {
+		todo!()
+	}
+
+	async fn test_search_cards_with_order_by() -> Result<()> {
+		todo!()
+	}
+
+	async fn test_search_cards_with_select() -> Result<()> {
+		todo!()
+	}
+
+	async fn test_get_sets() -> Result<()> {
+		todo!()
+	}
+
+	async fn test_get_set() -> Result<()> {
+		todo!()
+	}
+
+	async fn test_get_set_with_select() -> Result<()> {
+		todo!()
+	}
+
+	async fn test_search_sets() -> Result<()> {
+		todo!()
+	}
+
+	async fn test_search_sets_with_page() -> Result<()> {
+		todo!()
+	}
+
+	async fn test_search_sets_with_page_size() -> Result<()> {
+		todo!()
+	}
+
+	async fn test_search_sets_with_order_by() -> Result<()> {
+		todo!()
+	}
+
+	async fn test_search_sets_with_select() -> Result<()> {
+		todo!()
+	}
+
+	async fn test_get_types() -> Result<()> {
+		todo!()
+	}
+
+	async fn test_get_subtypes() -> Result<()> {
+		todo!()
+	}
+
+	async fn test_get_rarities() -> Result<()> {
+		todo!()
 	}
 }

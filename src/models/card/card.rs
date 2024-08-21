@@ -1,6 +1,8 @@
 use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
 
+use super::{Ability, Attack, Images, TCGPlayer, CardMarket};
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Card {
@@ -32,8 +34,8 @@ pub struct Card {
 	pub regulation_mark: Option<String>,
 	pub images: Images,
 	// Skip for now
-	// pub tcgplayer: TCGPlayer
-	// pub cardmarket: CardMarket
+	pub tcgplayer: Option<TCGPlayer>,
+	pub cardmarket: Option<CardMarket>,
 }
 
 impl PartialEq for Card {
@@ -43,28 +45,3 @@ impl PartialEq for Card {
 }
 
 impl Eq for Card {}
-
-/// Card Specific Types
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Ability {
-	pub name: String,
-	pub text: String,
-	#[serde(rename = "type")]
-	pub ability_type: String,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Attack {
-	pub cost: Vec<String>,
-	pub name: String,
-	pub text: String,
-	pub damage: String,
-	pub converted_energy_cost: i32,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Images {
-	pub small: String,
-	pub large: String,
-}
