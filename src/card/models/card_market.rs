@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 pub struct CardMarket {
 	pub url: String,
 	pub updated_at: String,
-	pub prices: CardMarketPrices,
+	pub prices: Option<CardMarketPrices>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

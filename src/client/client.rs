@@ -1,6 +1,6 @@
 use std::sync::Arc;
 use super::{PaginatedApiResponse, ApiResponse};
-use crate::{Card, Error, Result};
+use crate::{Card, Error, Requestable, Result};
 use crate::card::*;
 
 #[derive(Debug, Clone)]
@@ -15,6 +15,10 @@ impl Default for Client {
 }
 
 impl Client {
+	// What I want client.get_card() to return is a GetCard builder that has a select() method and a send() method
+	// So that you can call client.get_card("id").send().await?; to get the card
+	// Or client.get_card("id").select("name").send().await?; to get the card with just the name filled out
+	// Heavily inspired by reqwest and it's client.get() -> RequestBuilder / client.get().send() api
 	pub fn builder() -> ClientBuilder {
 		ClientBuilder::default()
 	}
@@ -27,16 +31,15 @@ impl Client {
 		self.inner.api_key.as_ref().unwrap_or(&String::from("")).to_string()
 	}
 
-	pub(crate) async fn get<T>(&self, endpoint: &str, params: Option<Vec<(&str, &str)>>) -> Result<T>
+	pub(crate) async fn get<T, R>(&self, request: R) -> Result<T>
 	where
 		T: serde::de::DeserializeOwned,
+		R: Requestable,
 	{
-		let mut req = self.web_client()
-			.get(format!("https://api.pokemontcg.io/v2/{}", endpoint))
-			.header("X-Api-Key", self.api_key());
-		if let Some(params) = params {
-			req = req.query(&params);
-		}
+		let req = self.web_client()
+			.get(format!("https://api.pokemontcg.io/v2/{}", request.endpoint()))
+			.header("X-Api-Key", self.api_key())
+			.query(&request.params());
 		println!("{:?}", &req);
 		// let tmp = req.try_clone().unwrap().send().await.unwrap();
 		// let txt = tmp.text().await.unwrap();
@@ -46,19 +49,15 @@ impl Client {
 		Ok(ret)
 	}
 
-	pub async fn get_cards(&self) -> Result<Option<Vec<Card>>> {
-		let resp: PaginatedApiResponse<Card> = self.get("cards", None).await?;
-		Ok(resp.data)
-	}
+	// pub async fn get_cards(&self) -> Result<Option<Vec<Card>>> {
+	// 	let resp: PaginatedApiResponse<Card> = self.get("cards", None).await?;
+	// 	Ok(resp.data)
+	// }
 
-	pub async fn get_card(&self, id: impl Into<String>) -> Result<Option<Card>> {
-		let resp: ApiResponse<Card> = self.get(&format!("cards/{}", id.into()), None).await?;
-		Ok(resp.data)
-	}
-
-	pub fn search_cards(&self) -> SearchCardsBuilder {
-		SearchCardsBuilder::new(self.clone())
-	}
+	// pub async fn get_card(&self, id: impl Into<String>) -> Result<Option<Card>> {
+	// 	let resp: ApiResponse<Card> = self.get(&format!("cards/{}", id.into()), None).await?;
+	// 	Ok(resp.data)
+	// }
 
 	// pub async fn search_cards(&self, q: Option<&str>) -> Result<Option<Vec<Card>>> {
 	// 	let params = if let Some(query) = q {
@@ -122,70 +121,6 @@ impl ClientBuilder {
 #[cfg(test)]
 mod tests {
 	use super::*;
-	// What I want client.get_card() to return is a GetCard builder that has a select() method and a send() method
-	// So that you can call client.get_card("id").send().await?; to get the card
-	// Or client.get_card("id").select("name").send().await?; to get the card with just the name filled out
-	// Heavily inspired by reqwest and it's client.get() -> RequestBuilder / client.get().send() api
-	fn client() -> Client {
-		let poketcg_key = dotenv::var("POKETCGAPIKEY").unwrap();
-		Client::builder().api_key(poketcg_key).build()
-	}
-
-	#[tokio::test]
-	#[ignore] // Heavy test, doesn't need to be run by default
-	async fn test_cards() -> Result<()> {
-		let client = client();
-		let cards = client.get_cards().await?;
-		assert!(cards.is_some());
-		Ok(())
-	}
-
-	#[tokio::test]
-	async fn test_card() -> Result<()> {
-		let client = client();
-		let card = client.get_card("xy1-1").await?;
-		assert!(card.is_some());
-		assert_eq!(card.unwrap().id, String::from("xy1-1"));
-		Ok(())
-	}
-
-	async fn test_card_with_select() {
-		todo!()
-	}
-
-	#[tokio::test]
-	async fn test_search_cards() -> Result<()> {
-		let client = client();
-		let searched_cards = client.search_cards().send().await?;
-		assert!(searched_cards.data.is_some());
-
-		Ok(())
-	}
-
-	#[tokio::test]
-	async fn test_search_cards_with_query() -> Result<()> {
-		let client = client();
-		let searched_cards = client.search_cards().query("name:magikarp").send().await?;
-		assert!(searched_cards.data.is_some());
-
-		Ok(())
-	}
-
-	async fn test_search_cards_with_page() -> Result<()> {
-		todo!()
-	}
-
-	async fn test_search_cards_with_page_size() -> Result<()> {
-		todo!()
-	}
-
-	async fn test_search_cards_with_order_by() -> Result<()> {
-		todo!()
-	}
-
-	async fn test_search_cards_with_select() -> Result<()> {
-		todo!()
-	}
 
 	async fn test_get_sets() -> Result<()> {
 		todo!()
