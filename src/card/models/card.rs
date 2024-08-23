@@ -39,7 +39,7 @@ pub struct Card {
 
 impl PartialEq for Card {
 	fn eq(&self, other: &Self) -> bool {
-		self.name == other.name
+		self.id == other.id
 	}
 }
 

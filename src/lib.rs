@@ -2,6 +2,10 @@
 
 mod card;
 mod set;
+mod rarities;
+mod subtypes;
+mod supertypes;
+mod types;
 
 mod client;
 mod error;

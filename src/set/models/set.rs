@@ -7,13 +7,21 @@ use super::SetImages;
 #[serde(rename_all = "camelCase")]
 pub struct Set {
 	pub id: String,
-	pub name: String,
-	pub series: String,
-	pub printed_total: i64,
-	pub total: i64,
-	pub legalities: HashMap<String, String>,
+	pub name: Option<String>,
+	pub series: Option<String>,
+	pub printed_total: Option<i64>,
+	pub total: Option<i64>,
+	pub legalities: Option<HashMap<String, String>>,
 	pub ptcgo_code: Option<String>,
-	pub release_date: String,
-	pub updated_at: String,
-	pub images: SetImages,
+	pub release_date: Option<String>,
+	pub updated_at: Option<String>,
+	pub images: Option<SetImages>,
 }
+
+impl PartialEq for Set {
+	fn eq(&self, other: &Self) -> bool {
+		self.id == other.id
+	}
+}
+
+impl Eq for Set {}

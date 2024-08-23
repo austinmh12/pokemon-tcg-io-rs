@@ -1,7 +1,5 @@
 use std::sync::Arc;
-use super::{PaginatedApiResponse, ApiResponse};
-use crate::{Card, Error, Requestable, Result};
-use crate::card::*;
+use crate::{Requestable, Result};
 
 #[derive(Debug, Clone)]
 pub struct Client {
@@ -40,34 +38,9 @@ impl Client {
 			.get(format!("https://api.pokemontcg.io/v2/{}", request.endpoint()))
 			.header("X-Api-Key", self.api_key())
 			.query(&request.params());
-		println!("{:?}", &req);
-		// let tmp = req.try_clone().unwrap().send().await.unwrap();
-		// let txt = tmp.text().await.unwrap();
-		// println!("{}", txt);
-		// let ret: T = req.send().await.map_err(|_| Error::Something)?.json().await.map_err(|_| Error::Something)?;
 		let ret: T = req.send().await.unwrap().json().await.unwrap();
 		Ok(ret)
 	}
-
-	// pub async fn get_cards(&self) -> Result<Option<Vec<Card>>> {
-	// 	let resp: PaginatedApiResponse<Card> = self.get("cards", None).await?;
-	// 	Ok(resp.data)
-	// }
-
-	// pub async fn get_card(&self, id: impl Into<String>) -> Result<Option<Card>> {
-	// 	let resp: ApiResponse<Card> = self.get(&format!("cards/{}", id.into()), None).await?;
-	// 	Ok(resp.data)
-	// }
-
-	// pub async fn search_cards(&self, q: Option<&str>) -> Result<Option<Vec<Card>>> {
-	// 	let params = if let Some(query) = q {
-	// 		Some(vec![("q", query)])
-	// 	} else {
-	// 		None
-	// 	};
-	// 	let resp: PaginatedApiResponse<Card> = self.get("cards", params).await?;
-	// 	Ok(resp.data)
-	// }
 }
 
 
@@ -115,54 +88,5 @@ impl ClientBuilder {
 			api_key: self.api_key
 		};
 		Client { inner: Arc::new(inner) }
-	}
-}
-
-#[cfg(test)]
-mod tests {
-	use super::*;
-
-	async fn test_get_sets() -> Result<()> {
-		todo!()
-	}
-
-	async fn test_get_set() -> Result<()> {
-		todo!()
-	}
-
-	async fn test_get_set_with_select() -> Result<()> {
-		todo!()
-	}
-
-	async fn test_search_sets() -> Result<()> {
-		todo!()
-	}
-
-	async fn test_search_sets_with_page() -> Result<()> {
-		todo!()
-	}
-
-	async fn test_search_sets_with_page_size() -> Result<()> {
-		todo!()
-	}
-
-	async fn test_search_sets_with_order_by() -> Result<()> {
-		todo!()
-	}
-
-	async fn test_search_sets_with_select() -> Result<()> {
-		todo!()
-	}
-
-	async fn test_get_types() -> Result<()> {
-		todo!()
-	}
-
-	async fn test_get_subtypes() -> Result<()> {
-		todo!()
-	}
-
-	async fn test_get_rarities() -> Result<()> {
-		todo!()
 	}
 }
