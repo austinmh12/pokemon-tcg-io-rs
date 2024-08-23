@@ -1,6 +1,7 @@
 use std::sync::Arc;
 use super::{PaginatedApiResponse, ApiResponse};
-use crate::{models::Card, Error, Result};
+use crate::{Card, Error, Result};
+use crate::card::*;
 
 #[derive(Debug, Clone)]
 pub struct Client {
@@ -26,7 +27,7 @@ impl Client {
 		self.inner.api_key.as_ref().unwrap_or(&String::from("")).to_string()
 	}
 
-	async fn get<T>(&self, endpoint: &str, params: Option<Vec<(&str, &str)>>) -> Result<T>
+	pub(crate) async fn get<T>(&self, endpoint: &str, params: Option<Vec<(&str, &str)>>) -> Result<T>
 	where
 		T: serde::de::DeserializeOwned,
 	{
@@ -36,6 +37,7 @@ impl Client {
 		if let Some(params) = params {
 			req = req.query(&params);
 		}
+		println!("{:?}", &req);
 		// let tmp = req.try_clone().unwrap().send().await.unwrap();
 		// let txt = tmp.text().await.unwrap();
 		// println!("{}", txt);
@@ -54,15 +56,19 @@ impl Client {
 		Ok(resp.data)
 	}
 
-	pub async fn search_cards(&self, q: Option<&str>) -> Result<Option<Vec<Card>>> {
-		let params = if let Some(query) = q {
-			Some(vec![("q", query)])
-		} else {
-			None
-		};
-		let resp: PaginatedApiResponse<Card> = self.get("cards", params).await?;
-		Ok(resp.data)
+	pub fn search_cards(&self) -> SearchCardsBuilder {
+		SearchCardsBuilder::new(self.clone())
 	}
+
+	// pub async fn search_cards(&self, q: Option<&str>) -> Result<Option<Vec<Card>>> {
+	// 	let params = if let Some(query) = q {
+	// 		Some(vec![("q", query)])
+	// 	} else {
+	// 		None
+	// 	};
+	// 	let resp: PaginatedApiResponse<Card> = self.get("cards", params).await?;
+	// 	Ok(resp.data)
+	// }
 }
 
 
@@ -120,12 +126,15 @@ mod tests {
 	// So that you can call client.get_card("id").send().await?; to get the card
 	// Or client.get_card("id").select("name").send().await?; to get the card with just the name filled out
 	// Heavily inspired by reqwest and it's client.get() -> RequestBuilder / client.get().send() api
+	fn client() -> Client {
+		let poketcg_key = dotenv::var("POKETCGAPIKEY").unwrap();
+		Client::builder().api_key(poketcg_key).build()
+	}
 
 	#[tokio::test]
 	#[ignore] // Heavy test, doesn't need to be run by default
 	async fn test_cards() -> Result<()> {
-		let poketcg_key = dotenv::var("POKETCGAPIKEY").unwrap();
-		let client = Client::builder().api_key(poketcg_key).build();
+		let client = client();
 		let cards = client.get_cards().await?;
 		assert!(cards.is_some());
 		Ok(())
@@ -133,8 +142,7 @@ mod tests {
 
 	#[tokio::test]
 	async fn test_card() -> Result<()> {
-		let poketcg_key = dotenv::var("POKETCGAPIKEY").unwrap();
-		let client = Client::builder().api_key(poketcg_key).build();
+		let client = client();
 		let card = client.get_card("xy1-1").await?;
 		assert!(card.is_some());
 		assert_eq!(card.unwrap().id, String::from("xy1-1"));
@@ -145,9 +153,22 @@ mod tests {
 		todo!()
 	}
 
-	// #[tokio::test]
+	#[tokio::test]
 	async fn test_search_cards() -> Result<()> {
-		todo!()
+		let client = client();
+		let searched_cards = client.search_cards().send().await?;
+		assert!(searched_cards.data.is_some());
+
+		Ok(())
+	}
+
+	#[tokio::test]
+	async fn test_search_cards_with_query() -> Result<()> {
+		let client = client();
+		let searched_cards = client.search_cards().query("name:magikarp").send().await?;
+		assert!(searched_cards.data.is_some());
+
+		Ok(())
 	}
 
 	async fn test_search_cards_with_page() -> Result<()> {

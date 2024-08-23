@@ -1,4 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct CardMarket;
+pub struct SetImages {
+	pub symbol: String,
+	pub logo: String,
+}

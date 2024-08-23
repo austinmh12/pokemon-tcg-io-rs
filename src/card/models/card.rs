@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
 
-use super::{Ability, Attack, Images, TCGPlayer, CardMarket};
+use super::*;
 use crate::Set;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -32,7 +32,7 @@ pub struct Card {
 	pub national_pokedex_numbers: Option<Vec<i32>>,
 	pub legalities: HashMap<String, String>,
 	pub regulation_mark: Option<String>,
-	pub images: Images,
+	pub images: CardImages,
 	pub tcgplayer: Option<TCGPlayer>,
 	pub cardmarket: Option<CardMarket>,
 }
