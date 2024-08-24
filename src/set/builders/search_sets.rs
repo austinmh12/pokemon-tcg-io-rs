@@ -81,8 +81,30 @@ impl SearchSetsBuilder {
 	}
 
 	pub async fn send(self) -> Result<Option<Vec<Set>>> {
-		let ret: PaginatedApiResponse<Set> = self.client.get(self.request).await?;
-		Ok(ret.data)
+		let mut sets: Vec<Set> = vec![];
+		let mut request = self.request.clone();
+		// Get all pages if none is specified
+		if request.page.is_none() {
+			loop {
+				let ret: PaginatedApiResponse<Set> = self.client.get(request.clone()).await?;
+				sets.extend(ret.data.unwrap_or_default());
+				if ret.page >= ret.total_count / ret.page_size {
+					break;
+				}
+				*request.page.get_or_insert(1) += 1;
+			}
+		// Otherwise fetch the specified page
+		} else {
+			let ret: PaginatedApiResponse<Set> = self.client.get(request.clone()).await?;
+			sets.extend(ret.data.unwrap_or_default());
+		}
+		
+
+		if sets.len() > 0usize {
+			Ok(Some(sets))
+		} else {
+			Ok(None)
+		}
 	}
 }
 
@@ -125,7 +147,7 @@ mod tests {
 	#[tokio::test]
 	async fn test_search_sets_with_page() -> Result<()> {
 		let client = client();
-		let searched_sets = client.search_sets().page(2).send().await?;
+		let searched_sets = client.search_sets().page(2).page_size(1).send().await?;
 		assert!(searched_sets.is_some());
 
 		Ok(())
@@ -134,7 +156,7 @@ mod tests {
 	#[tokio::test]
 	async fn test_search_sets_with_page_size() -> Result<()> {
 		let client = client();
-		let searched_sets = client.search_sets().page_size(2).send().await?;
+		let searched_sets = client.search_sets().page(1).page_size(2).send().await?;
 		assert!(searched_sets.is_some());
 		assert_eq!(searched_sets.unwrap().len(), 2usize);
 
