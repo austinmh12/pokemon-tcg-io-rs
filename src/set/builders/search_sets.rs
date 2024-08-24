@@ -4,6 +4,9 @@ use crate::{Client, Requestable, Result};
 use crate::client::PaginatedApiResponse;
 use crate::Set;
 
+/// A builder to construct the properties for the sets endpoint
+/// 
+/// To construct a `SearchSetsBuilder`, refer to the `Client` documentation.
 #[derive(Debug, Clone)]
 pub struct SearchSetsBuilder {
 	client: Client,
@@ -51,26 +54,37 @@ impl SearchSetsBuilder {
 		SearchSetsBuilder { client, request: SearchSets::default() }
 	}
 
+	/// Query to search with.
+	/// 
+	/// For information on the syntax, go to <https://pokemontcg.guru/syntax>
 	pub fn query(mut self, value: impl Into<String>) -> SearchSetsBuilder {
 		self.request.query = Some(value.into());
 		self
 	}
 
+	/// Page to start fetching results from.
+	/// 
+	/// If not provided, all results are fetched.
 	pub fn page(mut self, value: u32) -> SearchSetsBuilder {
 		self.request.page = Some(value);
 		self
 	}
 
+	/// The size of the results.
 	pub fn page_size(mut self, value: u32) -> SearchSetsBuilder {
 		self.request.page_size = Some(value);
 		self
 	}
 
+	/// Order of the results.
 	pub fn order_by(mut self, value: impl Into<String>) -> SearchSetsBuilder {
 		self.request.order_by = Some(value.into());
 		self
 	}
 
+	/// Specific fields to fetch with the sets.
+	/// 
+	/// Always includes "id" if not added.
 	pub fn select(mut self, value: impl Into<String>) -> SearchSetsBuilder {
 		let mut val: String = value.into();
 		if !val.contains("id") {
@@ -80,6 +94,24 @@ impl SearchSetsBuilder {
 		self
 	}
 
+	/// Sends the request to the sets endpoint with the provided parameters.
+	/// 
+	/// # Errors
+	/// 
+	/// This method fails if there was an error sending the request or if the response
+	/// doesn't include a field due to an error in the API.
+	/// 
+	/// # Example
+	/// 
+	/// ```no_run
+	/// # use pokemontcgio::{Client, Result};
+	/// # 
+	/// # async fn run() -> Result<()> {
+	/// let client = Client::with_api_key("YOUR_KEY");
+	/// client.search_sets().send().await?;
+	/// # Ok(())
+	/// # }
+	/// ```
 	pub async fn send(self) -> Result<Option<Vec<Set>>> {
 		let mut sets: Vec<Set> = vec![];
 		let mut request = self.request.clone();
