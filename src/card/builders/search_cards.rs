@@ -81,8 +81,30 @@ impl SearchCardsBuilder {
 	}
 
 	pub async fn send(self) -> Result<Option<Vec<Card>>> {
-		let ret: PaginatedApiResponse<Card> = self.client.get(self.request).await?;
-		Ok(ret.data)
+		let mut cards: Vec<Card> = vec![];
+		let mut request = self.request.clone();
+		// Get all pages if none is specified
+		if request.page.is_none() {
+			loop {
+				let ret: PaginatedApiResponse<Card> = self.client.get(request.clone()).await?;
+				cards.extend(ret.data.unwrap_or_default());
+				if ret.page >= ret.total_count / ret.page_size {
+					break;
+				}
+				*request.page.get_or_insert(1) += 1;
+			}
+		// Otherwise fetch the specified page
+		} else {
+			let ret: PaginatedApiResponse<Card> = self.client.get(request.clone()).await?;
+			cards.extend(ret.data.unwrap_or_default());
+		}
+		
+
+		if cards.len() > 0usize {
+			Ok(Some(cards))
+		} else {
+			Ok(None)
+		}
 	}
 }
 
@@ -107,6 +129,8 @@ mod tests {
 		let client = client();
 		let searched_cards = client.search_cards().send().await?;
 		assert!(searched_cards.is_some());
+		let cards = searched_cards.unwrap();
+		assert!(cards.len() > 250usize);
 
 		Ok(())
 	}
@@ -132,7 +156,7 @@ mod tests {
 	#[tokio::test]
 	async fn test_search_cards_with_page_size() -> Result<()> {
 		let client = client();
-		let searched_cards = client.search_cards().page_size(2).send().await?;
+		let searched_cards = client.search_cards().page(1).page_size(2).send().await?;
 		assert!(searched_cards.is_some());
 		assert_eq!(searched_cards.unwrap().len(), 2usize);
 
@@ -142,7 +166,7 @@ mod tests {
 	#[tokio::test]
 	async fn test_search_cards_with_order_by() -> Result<()> {
 		let client = client();
-		let searched_cards = client.search_cards().order_by("number").send().await?;
+		let searched_cards = client.search_cards().page(1).order_by("number").send().await?;
 		assert!(searched_cards.is_some());
 
 		Ok(())
@@ -151,7 +175,7 @@ mod tests {
 	#[tokio::test]
 	async fn test_search_cards_with_select() -> Result<()> {
 		let client = client();
-		let searched_cards = client.search_cards().select("id").send().await?;
+		let searched_cards = client.search_cards().page(1).select("id").send().await?;
 		assert!(searched_cards.is_some());
 
 		Ok(())
@@ -160,7 +184,7 @@ mod tests {
 	#[tokio::test]
 	async fn test_search_cards_with_select_without_required_fields() -> Result<()> {
 		let client = client();
-		let searched_cards = client.search_cards().select("number").send().await?;
+		let searched_cards = client.search_cards().page(1).select("number").send().await?;
 		assert!(searched_cards.is_some());
 
 		Ok(())
