@@ -3,6 +3,9 @@ use std::borrow::Cow;
 use crate::{Client, Requestable, Result};
 use crate::client::ApiResponse;
 
+/// A builder to construct the properties for the subtypes endpoint
+/// 
+/// To construct a `GetSubtypesBuilder`, refer to the `Client` documentation.
 #[derive(Debug, Clone)]
 pub struct GetSubtypesBuilder {
 	client: Client,
@@ -23,6 +26,24 @@ impl GetSubtypesBuilder {
 		GetSubtypesBuilder { client, request: GetSubtypes::default() }
 	}
 
+	/// Sends the request to the subtypes endpoint with the provided parameters.
+	/// 
+	/// # Errors
+	/// 
+	/// This method fails if there was an error sending the request or if the response
+	/// doesn't include a field due to an error in the API.
+	/// 
+	/// # Example
+	/// 
+	/// ```no_run
+	/// # use pokemontcgio::{Client, Result};
+	/// # 
+	/// # async fn run() -> Result<()> {
+	/// let client = Client::with_api_key("YOUR_KEY");
+	/// client.get_subtypes().send().await?;
+	/// # Ok(())
+	/// # }
+	/// ```
 	pub async fn send(self) -> Result<Option<Vec<String>>> {
 		let ret: ApiResponse<Vec<String>> = self.client.get(self.request).await?;
 		Ok(ret.data)
@@ -31,6 +52,7 @@ impl GetSubtypesBuilder {
 
 // Client implementations
 impl Client {
+	/// Convenience method to make a request to the subtypes endpoint.
 	pub fn get_subtypes(&self) -> GetSubtypesBuilder {
 		GetSubtypesBuilder::new(self.clone())
 	}

@@ -142,6 +142,7 @@ impl SearchSetsBuilder {
 
 // Client implementations
 impl Client {
+	/// Convenience method to make a request to the sets endpoint.
 	pub fn search_sets(&self) -> SearchSetsBuilder {
 		SearchSetsBuilder::new(self.clone())
 	}
