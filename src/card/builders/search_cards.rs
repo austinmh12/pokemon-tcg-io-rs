@@ -5,6 +5,9 @@ use crate::{Client, Requestable, Result};
 use crate::client::PaginatedApiResponse;
 use crate::Card;
 
+/// A builder to construct the properties for the cards endpoint
+/// 
+/// To construct a `SearchCardsBuilder`, refer to the `Client` documentation.
 #[derive(Debug, Clone)]
 pub struct SearchCardsBuilder {
 	client: Client,
@@ -52,26 +55,37 @@ impl SearchCardsBuilder {
 		SearchCardsBuilder { client, request: SearchCards::default() }
 	}
 
+	/// Query to search with.
+	/// 
+	/// For information on the syntax, go to <https://pokemontcg.guru/syntax>
 	pub fn query(mut self, value: impl Into<String>) -> SearchCardsBuilder {
 		self.request.query = Some(value.into());
 		self
 	}
 
+	/// Page to start fetching results from.
+	/// 
+	/// If not provided, all results are fetched.
 	pub fn page(mut self, value: u32) -> SearchCardsBuilder {
 		self.request.page = Some(value);
 		self
 	}
 
+	/// The size of the results.
 	pub fn page_size(mut self, value: u32) -> SearchCardsBuilder {
 		self.request.page_size = Some(value);
 		self
 	}
 
+	/// Order of the results.
 	pub fn order_by(mut self, value: impl Into<String>) -> SearchCardsBuilder {
 		self.request.order_by = Some(value.into());
 		self
 	}
 
+	/// Specific fields to fetch with the cards.
+	/// 
+	/// Always includes "id" if not added.
 	pub fn select(mut self, value: impl Into<String>) -> SearchCardsBuilder {
 		let mut val: String = value.into();
 		if !val.contains("id") {
@@ -81,6 +95,28 @@ impl SearchCardsBuilder {
 		self
 	}
 
+	/// Sends the request to the cards endpoint with the provided parameters.
+	/// 
+	/// This is called when awaiting the `SearchCardsBuilder` as well
+	/// 
+	/// # Errors
+	/// 
+	/// This method fails if there was an error sending the request or if the response
+	/// doesn't include a field due to an error in the API.
+	/// 
+	/// # Example
+	/// 
+	/// ```no_run
+	/// # use pokemontcgio::{Client, Result};
+	/// # 
+	/// # async fn run() -> Result<()> {
+	/// let client = Client::with_api_key("YOUR_KEY");
+	/// client.search_cards().send().await?;
+	/// // or
+	/// client.search_cards().await?;
+	/// # Ok(())
+	/// # }
+	/// ```
 	pub async fn send(self) -> Result<Option<Vec<Card>>> {
 		let mut cards: Vec<Card> = vec![];
 		let mut request = self.request.clone();
@@ -120,6 +156,7 @@ impl IntoFuture for SearchCardsBuilder {
 
 // Client implementations
 impl Client {
+	/// Convenience method to make a request to the cards endpoint.
 	pub fn search_cards(&self) -> SearchCardsBuilder {
 		SearchCardsBuilder::new(self.clone())
 	}
