@@ -1,8 +1,13 @@
+use derive_more::From;
+
 pub type Result<T> = core::result::Result<T, Error>;
 
-#[derive(Debug)]
+#[derive(Debug, From)]
 pub enum Error {
-	Something,
+	#[from]
+	ApiResponseError(reqwest::Error),
+	#[from]
+	JSONParseError(serde_json::Error)
 }
 
 impl core::fmt::Display for Error {

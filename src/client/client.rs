@@ -41,7 +41,7 @@ impl Client {
 			.get(format!("https://api.pokemontcg.io/v2/{}", request.endpoint()))
 			.header("X-Api-Key", self.api_key())
 			.query(&request.params());
-		let ret: T = req.send().await.unwrap().json().await.unwrap();
+		let ret: T = req.send().await?.json().await?;
 		Ok(ret)
 	}
 }
