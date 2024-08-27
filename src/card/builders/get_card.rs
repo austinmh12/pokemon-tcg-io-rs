@@ -96,6 +96,7 @@ impl IntoFuture for GetCardBuilder {
 }
 
 impl Client {
+	/// Convenience method to make a request to the cards/{id} endpoint.
 	pub fn get_card(&self, id: impl Into<String>) -> GetCardBuilder {
 		GetCardBuilder::new(self.clone(), id)
 	}

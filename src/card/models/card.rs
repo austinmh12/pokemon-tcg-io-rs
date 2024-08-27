@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 use super::*;
 use crate::Set;
 
+/// Represents a Pokémon card from the pokemontcg.io REST API.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Card {

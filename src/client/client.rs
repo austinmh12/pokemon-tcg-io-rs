@@ -1,9 +1,10 @@
 use std::sync::Arc;
 use crate::{Requestable, Result};
 
+/// A client for the Pokémon TCG IO REST API.
 #[derive(Debug, Clone)]
 pub struct Client {
-	pub(super) inner: Arc<ClientInner>
+	inner: Arc<ClientInner>
 }
 
 impl Default for Client {
@@ -13,10 +14,12 @@ impl Default for Client {
 }
 
 impl Client {
+	/// Provides a `ClientBuilder` for configuring the `Client` instance.
 	pub fn builder() -> ClientBuilder {
 		ClientBuilder::default()
 	}
 
+	/// Returns a `Client` with the API key set.
 	pub fn with_api_key(key: impl Into<String>) -> Client {
 		ClientBuilder::default().api_key(key).build()
 	}
@@ -60,7 +63,7 @@ impl Default for ClientInner {
 	}
 }
 
-/// ClientBuilder
+/// A builder to construct the properties for a `Client`.
 #[derive(Debug, Default)]
 pub struct ClientBuilder {
 	web_client: Option<reqwest::Client>,
@@ -69,19 +72,21 @@ pub struct ClientBuilder {
 
 /// Builder methods
 impl ClientBuilder {
-	pub fn with_reqwest(mut self, reqwest_client: reqwest::Client) -> Self {
+	/// Provide a custom reqwest client to the `Client`.
+	pub fn with_reqwest_client(mut self, reqwest_client: reqwest::Client) -> Self {
 		self.web_client = Some(reqwest_client);
 		self
 	}
 
+	/// Provide an API key to the client.
 	pub fn api_key(mut self, key: impl Into<String>) -> Self {
 		self.api_key = Some(key.into());
 		self
 	}
 }
 
-/// Build() method
 impl ClientBuilder {
+	/// Build the `Client` struct with the builder's configuration.
 	pub fn build(self) -> Client {
 		let inner = ClientInner {
 			web_client: self.web_client.unwrap_or(reqwest::Client::new()),

@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 
+/// Holds the Card Market metadata for a card.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CardMarket {
@@ -8,6 +9,7 @@ pub struct CardMarket {
 	pub prices: Option<CardMarketPrices>,
 }
 
+/// Holds all of the Card Market price data. All prices are listed in Euros.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CardMarketPrices {

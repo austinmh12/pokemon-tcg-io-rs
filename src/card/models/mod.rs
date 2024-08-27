@@ -8,7 +8,7 @@ mod tcg_player;
 // Flatten
 pub use ability::Ability;
 pub use attack::Attack;
-pub use card_market::CardMarket;
+pub use card_market::{CardMarket, CardMarketPrices};
 pub use card::Card;
 pub use images::CardImages;
-pub use tcg_player::TCGPlayer;
+pub use tcg_player::{TCGPlayer, TCGPlayerPrints, TCGPlayerPrice};

@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 
+/// Represents an attack on a card.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Attack {

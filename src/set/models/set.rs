@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 
 use super::SetImages;
 
+/// Represents a printed set of cards from the pokemontcg.io REST API.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Set {
