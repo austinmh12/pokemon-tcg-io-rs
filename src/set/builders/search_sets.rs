@@ -1,4 +1,5 @@
 use std::borrow::Cow;
+use std::future::IntoFuture;
 
 use crate::{Client, Requestable, Result};
 use crate::client::PaginatedApiResponse;
@@ -96,6 +97,8 @@ impl SearchSetsBuilder {
 
 	/// Sends the request to the sets endpoint with the provided parameters.
 	/// 
+	/// This is called when awaiting the `SearchSetsBuilder` as well.
+	/// 
 	/// # Errors
 	/// 
 	/// This method fails if there was an error sending the request or if the response
@@ -137,6 +140,15 @@ impl SearchSetsBuilder {
 		} else {
 			Ok(None)
 		}
+	}
+}
+
+impl IntoFuture for SearchSetsBuilder {
+	type Output = Result<Option<Vec<Set>>>;
+	type IntoFuture = std::pin::Pin<Box<dyn std::future::Future<Output = Self::Output>>>;
+
+	fn into_future(self) -> Self::IntoFuture {
+		Box::pin(self.send())
 	}
 }
 

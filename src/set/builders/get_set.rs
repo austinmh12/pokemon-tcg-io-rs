@@ -1,4 +1,5 @@
 use std::borrow::Cow;
+use std::future::IntoFuture;
 
 use crate::{Client, Requestable, Result};
 use crate::client::ApiResponse;
@@ -59,6 +60,8 @@ impl GetSetBuilder {
 
 	/// Sends the request to the sets endpoint with the provided parameters.
 	/// 
+	/// This is called when awaiting the `GetSetBuilder` as well.
+	/// 
 	/// # Errors
 	/// 
 	/// This method fails if there was an error sending the request or if the response
@@ -78,6 +81,15 @@ impl GetSetBuilder {
 	pub async fn send(self) -> Result<Option<Set>> {
 		let ret: ApiResponse<Set> = self.client.get(self.request).await?;
 		Ok(ret.data)
+	}
+}
+
+impl IntoFuture for GetSetBuilder {
+	type Output = Result<Option<Set>>;
+	type IntoFuture = std::pin::Pin<Box<dyn std::future::Future<Output = Self::Output>>>;
+
+	fn into_future(self) -> Self::IntoFuture {
+		Box::pin(self.send())
 	}
 }
 

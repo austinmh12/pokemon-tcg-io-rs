@@ -97,7 +97,7 @@ impl SearchCardsBuilder {
 
 	/// Sends the request to the cards endpoint with the provided parameters.
 	/// 
-	/// This is called when awaiting the `SearchCardsBuilder` as well
+	/// This is called when awaiting the `SearchCardsBuilder` as well.
 	/// 
 	/// # Errors
 	/// 

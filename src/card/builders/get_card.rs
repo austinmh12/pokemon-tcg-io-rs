@@ -60,7 +60,7 @@ impl GetCardBuilder {
 
 	/// Sends the request to the cards endpoint with the provided parameters.
 	/// 
-	/// This is called when awaiting the `GetCardBuilder` as well
+	/// This is called when awaiting the `GetCardBuilder` as well.
 	/// 
 	/// # Errors
 	/// 
