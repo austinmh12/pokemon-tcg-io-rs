@@ -1,4 +1,5 @@
 use std::borrow::Cow;
+use std::future::IntoFuture;
 
 use crate::{Client, Requestable, Result};
 use crate::client::PaginatedApiResponse;
@@ -108,6 +109,15 @@ impl SearchCardsBuilder {
 	}
 }
 
+impl IntoFuture for SearchCardsBuilder {
+	type Output = Result<Option<Vec<Card>>>;
+	type IntoFuture = std::pin::Pin<Box<dyn std::future::Future<Output = Self::Output>>>;
+
+	fn into_future(self) -> Self::IntoFuture {
+		Box::pin(self.send())
+	}
+}
+
 // Client implementations
 impl Client {
 	pub fn search_cards(&self) -> SearchCardsBuilder {
@@ -186,6 +196,32 @@ mod tests {
 		let client = client();
 		let searched_cards = client.search_cards().page(1).select("number").send().await?;
 		assert!(searched_cards.is_some());
+
+		Ok(())
+	}
+
+	#[tokio::test]
+	async fn test_search_cards_await() -> Result<()> {
+		let client = client();
+		let cards = client.search_cards().page(1).await?;
+		assert!(cards.is_some());
+
+		Ok(())
+	}
+
+	#[tokio::test]
+	async fn test_search_cards_builder_await() -> Result<()> {
+		let client = client();
+		let cards = client.search_cards()
+			.page(1)
+			.page_size(10)
+			.query("name:magikarp")
+			.order_by("number")
+			.select("id,number,name")
+			.await?;
+		assert!(cards.is_some());
+		let cards = cards.unwrap();
+		assert_eq!(cards.len(), 10usize);
 
 		Ok(())
 	}
