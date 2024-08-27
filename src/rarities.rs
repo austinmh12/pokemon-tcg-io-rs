@@ -1,4 +1,5 @@
 use std::borrow::Cow;
+use std::future::IntoFuture;
 
 use crate::{Client, Requestable, Result};
 use crate::client::ApiResponse;
@@ -28,6 +29,8 @@ impl GetRaritiesBuilder {
 
 	/// Sends the request to the rarities endpoint with the provided parameters.
 	/// 
+	/// This is called when awaiting the `GetRaritiesBuilder` as well.
+	/// 
 	/// # Errors
 	/// 
 	/// This method fails if there was an error sending the request or if the response
@@ -40,13 +43,24 @@ impl GetRaritiesBuilder {
 	/// # 
 	/// # async fn run() -> Result<()> {
 	/// let client = Client::with_api_key("YOUR_KEY");
-	/// client.get_rarities("base1").send().await?;
+	/// client.get_rarities().send().await?;
+	/// // or
+	/// client.get_rarities().await?;
 	/// # Ok(())
 	/// # }
 	/// ```
 	pub async fn send(self) -> Result<Option<Vec<String>>> {
 		let ret: ApiResponse<Vec<String>> = self.client.get(self.request).await?;
 		Ok(ret.data)
+	}
+}
+
+impl IntoFuture for GetRaritiesBuilder {
+	type Output = Result<Option<Vec<String>>>;
+	type IntoFuture = std::pin::Pin<Box<dyn std::future::Future<Output = Self::Output>>>;
+
+	fn into_future(self) -> Self::IntoFuture {
+		Box::pin(self.send())
 	}
 }
 
@@ -71,6 +85,15 @@ mod tests {
 	async fn test_get_rarities() -> Result<()> {
 		let client = client();
 		let rarities = client.get_rarities().send().await?;
+		assert!(rarities.is_some());
+
+		Ok(())
+	}
+
+	#[tokio::test]
+	async fn test_get_rarities_await() -> Result<()> {
+		let client = client();
+		let rarities = client.get_rarities().await?;
 		assert!(rarities.is_some());
 
 		Ok(())
