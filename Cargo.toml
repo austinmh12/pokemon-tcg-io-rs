@@ -2,6 +2,12 @@
 name = "pokemontcgio"
 version = "0.1.0"
 edition = "2021"
+authors = ["Austin Heil"]
+description = "An interface for interacting with the pokemontcg.io REST API"
+readme = "readme.md"
+repository = "https://github.com/austinmh12/pokemon-tcg-io-rs"
+license = "MIT"
+keywords = ["pokemon", "rest", "api"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

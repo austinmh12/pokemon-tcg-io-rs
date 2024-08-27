@@ -14,7 +14,7 @@ let client = Client::with_api_key("API_KEY");
 ### Fetching a single card
 ```rust
 let client = Client::with_api_key("API_KEY");
-let card = client.get_card("swsh4-183").send().await?;
+let card = client.get_card("swsh4-183").await?;
 match card {
 	Some(c) => println!("{:?}", c),
 	None => println!("No card found!")
