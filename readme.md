@@ -3,7 +3,12 @@ This is a wrapper for the REST API of [pokemontcg.io](https://pokemontcg.io/) th
 
 # Usage
 ## Configuration
-TODO
+Run `cargo add pokemontcgio` or add the following to the `Cargo.toml` file:
+
+```toml
+[dependencies]
+pokemontcgio = "0.1.0"
+```
 
 ## Using With an API Key
 ```rust
