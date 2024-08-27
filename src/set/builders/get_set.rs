@@ -75,6 +75,8 @@ impl GetSetBuilder {
 	/// # async fn run() -> Result<()> {
 	/// let client = Client::with_api_key("YOUR_KEY");
 	/// client.get_set("base1").send().await?;
+	/// // or
+	/// client.get_set("base1").await?;
 	/// # Ok(())
 	/// # }
 	/// ```
@@ -141,6 +143,16 @@ mod tests {
 		assert_eq!(set.name, None);
 		assert!(set.total.is_some());
 
+		Ok(())
+	}
+
+	#[tokio::test]
+	async fn test_set_await() -> Result<()> {
+		let client = client();
+		let set = client.get_set("swsh1").await?;
+		assert!(set.is_some());
+		let set = set.unwrap();
+		assert_eq!(set.id, String::from("swsh1"));
 		Ok(())
 	}
 }

@@ -112,6 +112,8 @@ impl SearchSetsBuilder {
 	/// # async fn run() -> Result<()> {
 	/// let client = Client::with_api_key("YOUR_KEY");
 	/// client.search_sets().send().await?;
+	/// // or
+	/// client.search_sets().await?;
 	/// # Ok(())
 	/// # }
 	/// ```
@@ -230,6 +232,15 @@ mod tests {
 	async fn test_search_sets_with_select_without_required_fields() -> Result<()> {
 		let client = client();
 		let searched_sets = client.search_sets().select("total").send().await?;
+		assert!(searched_sets.is_some());
+
+		Ok(())
+	}
+
+	#[tokio::test]
+	async fn test_search_sets_await() -> Result<()> {
+		let client = client();
+		let searched_sets = client.search_sets().await?;
 		assert!(searched_sets.is_some());
 
 		Ok(())
