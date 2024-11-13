@@ -4,6 +4,7 @@ use std::future::IntoFuture;
 use crate::{Client, Requestable, Result};
 use crate::client::PaginatedApiResponse;
 use crate::Set;
+use crate::utils::futurize;
 
 /// A builder to construct the properties for the sets endpoint
 /// 
@@ -111,13 +112,11 @@ impl SearchSetsBuilder {
 	/// # 
 	/// # async fn run() -> Result<()> {
 	/// let client = Client::with_api_key("YOUR_KEY");
-	/// client.search_sets().send().await?;
-	/// // or
 	/// client.search_sets().await?;
 	/// # Ok(())
 	/// # }
 	/// ```
-	pub async fn send(self) -> Result<Option<Vec<Set>>> {
+	async fn send(self) -> Result<Option<Vec<Set>>> {
 		let mut sets: Vec<Set> = vec![];
 		let mut request = self.request.clone();
 		// Get all pages if none is specified
@@ -145,14 +144,7 @@ impl SearchSetsBuilder {
 	}
 }
 
-impl IntoFuture for SearchSetsBuilder {
-	type Output = Result<Option<Vec<Set>>>;
-	type IntoFuture = std::pin::Pin<Box<dyn std::future::Future<Output = Self::Output>>>;
-
-	fn into_future(self) -> Self::IntoFuture {
-		Box::pin(self.send())
-	}
-}
+futurize!(SearchSetsBuilder, Option<Vec<Set>>);
 
 // Client implementations
 impl Client {
@@ -174,7 +166,7 @@ mod tests {
 	#[tokio::test]
 	async fn test_search_sets() -> Result<()> {
 		let client = client();
-		let searched_sets = client.search_sets().send().await?;
+		let searched_sets = client.search_sets().await?;
 		assert!(searched_sets.is_some());
 
 		Ok(())
@@ -184,8 +176,9 @@ mod tests {
 	#[ignore]
 	async fn test_search_sets_with_query() -> Result<()> {
 		let client = client();
-		// This endpoint doesn't like reqwests serialization "name%3ASword+%26+Shield" vs what it wants "name:Sword%20&%20Shield"
-		let searched_sets = client.search_sets().query("name:Sword & Shield").send().await?;
+		// This endpoint doesn't like reqwests serialization 
+		// reqwests gives "name%3ASword+%26+Shield" vs what it wants "name:Sword%20&%20Shield"
+		let searched_sets = client.search_sets().query("name:Sword & Shield").await?;
 		assert!(searched_sets.is_some());
 
 		Ok(())
@@ -194,7 +187,7 @@ mod tests {
 	#[tokio::test]
 	async fn test_search_sets_with_page() -> Result<()> {
 		let client = client();
-		let searched_sets = client.search_sets().page(2).page_size(1).send().await?;
+		let searched_sets = client.search_sets().page(2).page_size(1).await?;
 		assert!(searched_sets.is_some());
 
 		Ok(())
@@ -203,7 +196,7 @@ mod tests {
 	#[tokio::test]
 	async fn test_search_sets_with_page_size() -> Result<()> {
 		let client = client();
-		let searched_sets = client.search_sets().page(1).page_size(2).send().await?;
+		let searched_sets = client.search_sets().page(1).page_size(2).await?;
 		assert!(searched_sets.is_some());
 		assert_eq!(searched_sets.unwrap().len(), 2usize);
 
@@ -213,7 +206,7 @@ mod tests {
 	#[tokio::test]
 	async fn test_search_sets_with_order_by() -> Result<()> {
 		let client = client();
-		let searched_sets = client.search_sets().order_by("releaseDate").send().await?;
+		let searched_sets = client.search_sets().order_by("releaseDate").await?;
 		assert!(searched_sets.is_some());
 
 		Ok(())
@@ -222,7 +215,7 @@ mod tests {
 	#[tokio::test]
 	async fn test_search_sets_with_select() -> Result<()> {
 		let client = client();
-		let searched_sets = client.search_sets().select("id").send().await?;
+		let searched_sets = client.search_sets().select("id").await?;
 		assert!(searched_sets.is_some());
 
 		Ok(())
@@ -231,16 +224,7 @@ mod tests {
 	#[tokio::test]
 	async fn test_search_sets_with_select_without_required_fields() -> Result<()> {
 		let client = client();
-		let searched_sets = client.search_sets().select("total").send().await?;
-		assert!(searched_sets.is_some());
-
-		Ok(())
-	}
-
-	#[tokio::test]
-	async fn test_search_sets_await() -> Result<()> {
-		let client = client();
-		let searched_sets = client.search_sets().await?;
+		let searched_sets = client.search_sets().select("total").await?;
 		assert!(searched_sets.is_some());
 
 		Ok(())

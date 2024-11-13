@@ -3,6 +3,7 @@ use std::future::IntoFuture;
 
 use crate::{Client, Requestable, Result};
 use crate::client::ApiResponse;
+use crate::utils::futurize;
 
 /// A builder to construct the properties for the rarities endpoint
 /// 
@@ -43,8 +44,6 @@ impl GetRaritiesBuilder {
 	/// # 
 	/// # async fn run() -> Result<()> {
 	/// let client = Client::with_api_key("YOUR_KEY");
-	/// client.get_rarities().send().await?;
-	/// // or
 	/// client.get_rarities().await?;
 	/// # Ok(())
 	/// # }
@@ -55,14 +54,7 @@ impl GetRaritiesBuilder {
 	}
 }
 
-impl IntoFuture for GetRaritiesBuilder {
-	type Output = Result<Option<Vec<String>>>;
-	type IntoFuture = std::pin::Pin<Box<dyn std::future::Future<Output = Self::Output>>>;
-
-	fn into_future(self) -> Self::IntoFuture {
-		Box::pin(self.send())
-	}
-}
+futurize!(GetRaritiesBuilder, Option<Vec<String>>);
 
 // Client implementations
 impl Client {
@@ -83,15 +75,6 @@ mod tests {
 
 	#[tokio::test]
 	async fn test_get_rarities() -> Result<()> {
-		let client = client();
-		let rarities = client.get_rarities().send().await?;
-		assert!(rarities.is_some());
-
-		Ok(())
-	}
-
-	#[tokio::test]
-	async fn test_get_rarities_await() -> Result<()> {
 		let client = client();
 		let rarities = client.get_rarities().await?;
 		assert!(rarities.is_some());

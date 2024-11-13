@@ -15,6 +15,7 @@ pub use set::Set;
 pub use error::{Error, Result};
 
 pub(crate) use utils::Requestable;
+pub(crate) use utils::futurize;
 
 // Public Modules
 pub mod rarities;

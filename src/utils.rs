@@ -7,3 +7,18 @@ pub trait Requestable {
 		vec![]
 	}
 }
+
+macro_rules! futurize {
+	($struct:ty, $out:ty) => {
+		impl IntoFuture for $struct {
+			type Output = Result<$out>;
+			type IntoFuture = std::pin::Pin<Box<dyn std::future::Future<Output = Self::Output>>>;
+		
+			fn into_future(self) -> Self::IntoFuture {
+				Box::pin(self.send())
+			}
+		}
+	};
+}
+
+pub(crate) use futurize;

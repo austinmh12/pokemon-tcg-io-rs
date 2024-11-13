@@ -4,6 +4,7 @@ use std::future::IntoFuture;
 use crate::{Client, Requestable, Result};
 use crate::client::ApiResponse;
 use crate::Card;
+use crate::utils::futurize;
 
 /// A builder to construct the properties for the cards endpoint
 /// 
@@ -74,26 +75,17 @@ impl GetCardBuilder {
 	/// # 
 	/// # async fn run() -> Result<()> {
 	/// let client = Client::with_api_key("YOUR_KEY");
-	/// client.get_card("xy1-1").send().await?;
-	/// // or
 	/// client.get_card("xy1-1").await?;
 	/// # Ok(())
 	/// # }
 	/// ```
-	pub async fn send(self) -> Result<Option<Card>> {
+	async fn send(self) -> Result<Option<Card>> {
 		let ret: ApiResponse<Card> = self.client.get(self.request).await?;
 		Ok(ret.data)
 	}
 }
 
-impl IntoFuture for GetCardBuilder {
-	type Output = Result<Option<Card>>;
-	type IntoFuture = std::pin::Pin<Box<dyn std::future::Future<Output = Self::Output>>>;
-
-	fn into_future(self) -> Self::IntoFuture {
-		Box::pin(self.send())
-	}
-}
+futurize!(GetCardBuilder, Option<Card>);
 
 impl Client {
 	/// Convenience method to make a request to the cards/{id} endpoint.
@@ -114,7 +106,7 @@ mod tests {
 	#[tokio::test]
 	async fn test_card() -> Result<()> {
 		let client = client();
-		let card = client.get_card("xy1-1").send().await?;
+		let card = client.get_card("xy1-1").await?;
 		assert!(card.is_some());
 		let card = card.unwrap();
 		assert_eq!(card.id, String::from("xy1-1"));
@@ -124,7 +116,7 @@ mod tests {
 	#[tokio::test]
 	async fn test_card_with_select() -> Result<()> {
 		let client = client();
-		let card = client.get_card("xy1-1").select("id").send().await?;
+		let card = client.get_card("xy1-1").select("id").await?;
 		assert!(card.is_some());
 		let card = card.unwrap();
 		assert_eq!(card.id, String::from("xy1-1"));
@@ -136,23 +128,13 @@ mod tests {
 	#[tokio::test]
 	async fn test_card_with_select_without_required_fields() -> Result<()> {
 		let client = client();
-		let card = client.get_card("xy1-1").select("number,set").send().await?;
+		let card = client.get_card("xy1-1").select("number,set").await?;
 		assert!(card.is_some());
 		let card = card.unwrap();
 		assert_eq!(card.id, String::from("xy1-1"));
 		assert_eq!(card.name, None);
 		assert!(card.set.is_some());
 
-		Ok(())
-	}
-
-	#[tokio::test]
-	async fn test_card_await() -> Result<()> {
-		let client = client();
-		let card = client.get_card("xy1-1").await?;
-		assert!(card.is_some());
-		let card = card.unwrap();
-		assert_eq!(card.id, String::from("xy1-1"));
 		Ok(())
 	}
 }

@@ -7,7 +7,7 @@ Run `cargo add pokemontcgio` or add the following to the `Cargo.toml` file:
 
 ```toml
 [dependencies]
-pokemontcgio = "0.1.0"
+pokemontcgio = "0.1.1"
 ```
 
 ## Using With an API Key
@@ -29,7 +29,7 @@ match card {
 ```rust
 let client = Client::with_api_key("API_KEY");
 // Fetch cards with no filters
-let cards = client.search_cards().send().await?;
+let cards = client.search_cards().await?;
 match cards {
 	Some(c) => println!("{:?}", c),
 	None => println!("No cards found!")
@@ -43,7 +43,6 @@ let cards = client
 	.page_size(5)
 	.order_by("rarity")
 	.select("hp,flavor_text")
-	.send()
 	.await?;
 match cards {
 	Some(c) => println!("{:?}", c),
@@ -63,7 +62,7 @@ match set {
 }
 
 // Fetch sets with no filters
-let sets = client.search_sets().send().await?;
+let sets = client.search_sets().await?;
 match sets {
 	Some(c) => println!("{:?}", c),
 	None => println!("No sets found!")
@@ -77,7 +76,6 @@ let sets = client
 	.page_size(1)
 	.order_by("total")
 	.select("printed_total,total")
-	.send()
 	.await?;
 match sets {
 	Some(c) => println!("{:?}", c),
@@ -90,8 +88,8 @@ These types only provide methods for fetching them all
 let client = Client::with_api_key("API_KEY");
 
 // All are Vec<String>
-let types = client.get_types().send().await?;
-let subtypes = client.get_subtypes().send().await?;
-let supertypes = client.get_supertypes().send().await?;
-let rarities = client.get_rarities().send().await?;
+let types = client.get_types().await?;
+let subtypes = client.get_subtypes().await?;
+let supertypes = client.get_supertypes().await?;
+let rarities = client.get_rarities().await?;
 ```

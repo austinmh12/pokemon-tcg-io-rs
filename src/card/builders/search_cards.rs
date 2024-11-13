@@ -4,6 +4,7 @@ use std::future::IntoFuture;
 use crate::{Client, Requestable, Result};
 use crate::client::PaginatedApiResponse;
 use crate::Card;
+use crate::utils::futurize;
 
 /// A builder to construct the properties for the cards endpoint
 /// 
@@ -111,13 +112,11 @@ impl SearchCardsBuilder {
 	/// # 
 	/// # async fn run() -> Result<()> {
 	/// let client = Client::with_api_key("YOUR_KEY");
-	/// client.search_cards().send().await?;
-	/// // or
 	/// client.search_cards().await?;
 	/// # Ok(())
 	/// # }
 	/// ```
-	pub async fn send(self) -> Result<Option<Vec<Card>>> {
+	async fn send(self) -> Result<Option<Vec<Card>>> {
 		let mut cards: Vec<Card> = vec![];
 		let mut request = self.request.clone();
 		// Get all pages if none is specified
@@ -145,14 +144,7 @@ impl SearchCardsBuilder {
 	}
 }
 
-impl IntoFuture for SearchCardsBuilder {
-	type Output = Result<Option<Vec<Card>>>;
-	type IntoFuture = std::pin::Pin<Box<dyn std::future::Future<Output = Self::Output>>>;
-
-	fn into_future(self) -> Self::IntoFuture {
-		Box::pin(self.send())
-	}
-}
+futurize!(SearchCardsBuilder, Option<Vec<Card>>);
 
 // Client implementations
 impl Client {
@@ -174,7 +166,7 @@ mod tests {
 	#[tokio::test]
 	async fn test_search_cards() -> Result<()> {
 		let client = client();
-		let searched_cards = client.search_cards().send().await?;
+		let searched_cards = client.search_cards().await?;
 		assert!(searched_cards.is_some());
 		let cards = searched_cards.unwrap();
 		assert!(cards.len() > 250usize);
@@ -185,7 +177,7 @@ mod tests {
 	#[tokio::test]
 	async fn test_search_cards_with_query() -> Result<()> {
 		let client = client();
-		let searched_cards = client.search_cards().query("name:magikarp").send().await?;
+		let searched_cards = client.search_cards().query("name:magikarp").await?;
 		assert!(searched_cards.is_some());
 
 		Ok(())
@@ -194,7 +186,7 @@ mod tests {
 	#[tokio::test]
 	async fn test_search_cards_with_page() -> Result<()> {
 		let client = client();
-		let searched_cards = client.search_cards().page(2).send().await?;
+		let searched_cards = client.search_cards().page(2).await?;
 		assert!(searched_cards.is_some());
 
 		Ok(())
@@ -203,7 +195,7 @@ mod tests {
 	#[tokio::test]
 	async fn test_search_cards_with_page_size() -> Result<()> {
 		let client = client();
-		let searched_cards = client.search_cards().page(1).page_size(2).send().await?;
+		let searched_cards = client.search_cards().page(1).page_size(2).await?;
 		assert!(searched_cards.is_some());
 		assert_eq!(searched_cards.unwrap().len(), 2usize);
 
@@ -213,7 +205,7 @@ mod tests {
 	#[tokio::test]
 	async fn test_search_cards_with_order_by() -> Result<()> {
 		let client = client();
-		let searched_cards = client.search_cards().page(1).order_by("number").send().await?;
+		let searched_cards = client.search_cards().page(1).order_by("number").await?;
 		assert!(searched_cards.is_some());
 
 		Ok(())
@@ -222,7 +214,7 @@ mod tests {
 	#[tokio::test]
 	async fn test_search_cards_with_select() -> Result<()> {
 		let client = client();
-		let searched_cards = client.search_cards().page(1).select("id").send().await?;
+		let searched_cards = client.search_cards().page(1).select("id").await?;
 		assert!(searched_cards.is_some());
 
 		Ok(())
@@ -231,34 +223,8 @@ mod tests {
 	#[tokio::test]
 	async fn test_search_cards_with_select_without_required_fields() -> Result<()> {
 		let client = client();
-		let searched_cards = client.search_cards().page(1).select("number").send().await?;
+		let searched_cards = client.search_cards().page(1).select("number").await?;
 		assert!(searched_cards.is_some());
-
-		Ok(())
-	}
-
-	#[tokio::test]
-	async fn test_search_cards_await() -> Result<()> {
-		let client = client();
-		let cards = client.search_cards().page(1).await?;
-		assert!(cards.is_some());
-
-		Ok(())
-	}
-
-	#[tokio::test]
-	async fn test_search_cards_builder_await() -> Result<()> {
-		let client = client();
-		let cards = client.search_cards()
-			.page(1)
-			.page_size(10)
-			.query("name:magikarp")
-			.order_by("number")
-			.select("id,number,name")
-			.await?;
-		assert!(cards.is_some());
-		let cards = cards.unwrap();
-		assert_eq!(cards.len(), 10usize);
 
 		Ok(())
 	}

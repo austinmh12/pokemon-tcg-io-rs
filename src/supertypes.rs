@@ -3,6 +3,7 @@ use std::future::IntoFuture;
 
 use crate::{Client, Requestable, Result};
 use crate::client::ApiResponse;
+use crate::utils::futurize;
 
 /// A builder to construct the properties for the supertypes endpoint
 /// 
@@ -43,26 +44,17 @@ impl GetSupertypesBuilder {
 	/// # 
 	/// # async fn run() -> Result<()> {
 	/// let client = Client::with_api_key("YOUR_KEY");
-	/// client.get_supertypes().send().await?;
-	/// // or
 	/// client.get_supertypes().await?;
 	/// # Ok(())
 	/// # }
 	/// ```
-	pub async fn send(self) -> Result<Option<Vec<String>>> {
+	async fn send(self) -> Result<Option<Vec<String>>> {
 		let ret: ApiResponse<Vec<String>> = self.client.get(self.request).await?;
 		Ok(ret.data)
 	}
 }
 
-impl IntoFuture for GetSupertypesBuilder {
-	type Output = Result<Option<Vec<String>>>;
-	type IntoFuture = std::pin::Pin<Box<dyn std::future::Future<Output = Self::Output>>>;
-
-	fn into_future(self) -> Self::IntoFuture {
-		Box::pin(self.send())
-	}
-}
+futurize!(GetSupertypesBuilder, Option<Vec<String>>);
 
 // Client implementations
 impl Client {
@@ -83,15 +75,6 @@ mod tests {
 
 	#[tokio::test]
 	async fn test_get_supertypes() -> Result<()> {
-		let client = client();
-		let supertypes = client.get_supertypes().send().await?;
-		assert!(supertypes.is_some());
-
-		Ok(())
-	}
-
-	#[tokio::test]
-	async fn test_get_supertypes_await() -> Result<()> {
 		let client = client();
 		let supertypes = client.get_supertypes().await?;
 		assert!(supertypes.is_some());

@@ -3,6 +3,7 @@ use std::future::IntoFuture;
 
 use crate::{Client, Requestable, Result};
 use crate::client::ApiResponse;
+use crate::utils::futurize;
 
 /// A builder to construct the properties for the types endpoint
 /// 
@@ -43,26 +44,17 @@ impl GetTypesBuilder {
 	/// # 
 	/// # async fn run() -> Result<()> {
 	/// let client = Client::with_api_key("YOUR_KEY");
-	/// client.get_types().send().await?;
-	/// // or
 	/// client.get_types().await?;
 	/// # Ok(())
 	/// # }
 	/// ```
-	pub async fn send(self) -> Result<Option<Vec<String>>> {
+	async fn send(self) -> Result<Option<Vec<String>>> {
 		let ret: ApiResponse<Vec<String>> = self.client.get(self.request).await?;
 		Ok(ret.data)
 	}
 }
 
-impl IntoFuture for GetTypesBuilder {
-	type Output = Result<Option<Vec<String>>>;
-	type IntoFuture = std::pin::Pin<Box<dyn std::future::Future<Output = Self::Output>>>;
-
-	fn into_future(self) -> Self::IntoFuture {
-		Box::pin(self.send())
-	}
-}
+futurize!(GetTypesBuilder, Option<Vec<String>>);
 
 // Client implementations
 impl Client {
@@ -83,15 +75,6 @@ mod tests {
 
 	#[tokio::test]
 	async fn test_get_types() -> Result<()> {
-		let client = client();
-		let types = client.get_types().send().await?;
-		assert!(types.is_some());
-
-		Ok(())
-	}
-
-	#[tokio::test]
-	async fn test_get_types_await() -> Result<()> {
 		let client = client();
 		let types = client.get_types().await?;
 		assert!(types.is_some());
