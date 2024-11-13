@@ -7,7 +7,7 @@ Run `cargo add pokemontcgio` or add the following to the `Cargo.toml` file:
 
 ```toml
 [dependencies]
-pokemontcgio = "0.1.1"
+pokemontcgio = "0.2.0"
 ```
 
 ## Using With an API Key
@@ -93,3 +93,6 @@ let subtypes = client.get_subtypes().await?;
 let supertypes = client.get_supertypes().await?;
 let rarities = client.get_rarities().await?;
 ```
+
+# Migrating from 0.1.0
+`0.2.0` made a change that removed the public `send()` method from each of the builders. To migrate to 0.2 from 0.1, simply remove any `.send().await?;` and use `.await?;` instead.
