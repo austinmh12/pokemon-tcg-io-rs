@@ -34,9 +34,9 @@ pub struct Card {
 	/// 
 	/// test - String - The text value of the ancient trait.
 	pub ancient_trait: Option<HashMap<String, String>>,
-	/// One or more abilities for a given card.
+	/// One or more [`Ability`]s for a given card.
 	pub abilities: Option<Vec<Ability>>,
-	/// One or more attacks for a given card.
+	/// One or more [`Attack`]s for a given card.
 	pub attacks: Option<Vec<Attack>>,
 	/// One or more weaknesses for a given card. A weakness has the following fields:
 	/// 
@@ -55,7 +55,7 @@ pub struct Card {
 	/// The converted retreat cost for a card is the count of energy types found within the retreat_cost field. For
 	/// example, ["Fire", "Water"] has a converted retreat cost of 2.
 	pub converted_retreat_cost: Option<i32>,
-	/// The `Set` the card belongs to.
+	/// The [`Set`] the card belongs to.
 	pub set: Option<Set>,
 	/// The number of the card.
 	pub number: Option<String>,
@@ -76,9 +76,9 @@ pub struct Card {
 	pub regulation_mark: Option<String>,
 	/// The images for a card.
 	pub images: Option<CardImages>,
-	/// The TCGPlayer information for a given card.
+	/// The [`TCGPlayer`] information for a given card.
 	pub tcgplayer: Option<TCGPlayer>,
-	/// The cardmarket information for a given card.
+	/// The [`CardMarket`] information for a given card.
 	pub cardmarket: Option<CardMarket>,
 }
 
