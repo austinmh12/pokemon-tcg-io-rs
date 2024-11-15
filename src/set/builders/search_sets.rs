@@ -176,9 +176,7 @@ mod tests {
 	#[ignore]
 	async fn test_search_sets_with_query() -> Result<()> {
 		let client = client();
-		// This endpoint doesn't like reqwests serialization 
-		// reqwests gives "name%3ASword+%26+Shield" vs what it wants "name:Sword%20&%20Shield"
-		let searched_sets = client.search_sets().query("name:Sword & Shield").await?;
+		let searched_sets = client.search_sets().query("name:\"Sword & Shield\"").await?;
 		assert!(searched_sets.is_some());
 
 		Ok(())
