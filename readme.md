@@ -71,7 +71,7 @@ match sets {
 // search_sets returns a builder with a number of methods to add filters
 let sets = client
 	.search_sets()
-	.query("series:Sword & Shield")
+	.query("series:\"Sword & Shield\"")
 	.page(4)
 	.page_size(1)
 	.order_by("total")
