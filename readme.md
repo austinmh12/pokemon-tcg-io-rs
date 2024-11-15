@@ -7,7 +7,7 @@ Run `cargo add pokemontcgio` or add the following to the `Cargo.toml` file:
 
 ```toml
 [dependencies]
-pokemontcgio = "0.2.0"
+pokemontcgio = "0.2.1"
 ```
 
 ## Using With an API Key
@@ -96,3 +96,10 @@ let rarities = client.get_rarities().await?;
 
 # Migrating from 0.1.0
 `0.2.0` made a change that removed the public `send()` method from each of the builders. To migrate to 0.2 from 0.1, simply remove any `.send().await?;` and use `.await?;` instead.
+
+# Changelog
+## v0.2.1
+- Changed `Ability.ability_type` to `Ability.type`.
+- Added `first_edition_holofoil` and `first_edition_normal` to `TCGPlayerPrints`.
+- Added `direct_low` to `TCGPlayerPrices`.
+- Updated documentation.
